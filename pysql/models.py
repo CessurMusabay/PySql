@@ -103,7 +103,7 @@ class Model:
         variables = get_variables(cls)
         keys = str(variables).replace(']', '').replace('[', '').replace("'", '')
 
-        sql = f"SELECT {keys} FROM {cls.__name__} WHERE id={id}"
+        sql = f"SELECT {keys} FROM {cls.__name__} WHERE id={id} ORDER BY id;"
 
         d = database.Database()
         data = d.execute(sql)
@@ -121,3 +121,17 @@ class Model:
             obj.values = result
             return obj
         return None
+
+    def join(self, foreign_class, foreign_field, join_type="INNER JOIN", group_by=None):
+        self_variables = get_variables(self)
+        self_variables.remove("values")
+        foreign_variables = get_variables(foreign_class)
+        self_variables = [self.__class__.__name__ + '.' + a for a in self_variables]
+        foreign_variables = [foreign_class.__name__ + '.' + a for a in foreign_variables]
+        sql = f"SELECT {','.join(self_variables)},{','.join(foreign_variables)} FROM {self.__class__.__name__} INNER JOIN {foreign_class.__name__} ON {foreign_class.__name__}.id={self.__class__.__name__}.{foreign_field}"
+        if group_by != None:
+            sql += " GROUP BY " + group_by
+        d = database.Database()
+        data = d.execute(sql)
+        d.close()
+        return data

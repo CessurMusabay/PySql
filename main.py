@@ -1,4 +1,4 @@
-from pysql.fields import Integer, VarChar, ForeignField, OnDelete,Text
+from pysql.fields import Integer, VarChar, ForeignField, OnDelete, Text
 from pysql.models import Model
 from pysql.utils import create_tables
 
@@ -17,18 +17,4 @@ class Review(Model):
 
 
 if __name__ == '__main__':
-    create_tables([
-
-        User(),
-        Review(),
-    ])
-    for obj in User.fetch("username LIKE " + f"'c%'"):
-        print(obj.values)
-
-
-
-
-
-
-
-
+    pass

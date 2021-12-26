@@ -19,6 +19,16 @@ class Database:
 
     def __create_database(self):
         self.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+        self.execute(f"USE {DB_NAME}")
+        self.execute("CREATE TABLE IF NOT EXISTS Log(id INT AUTO_INCREMENT PRIMARY KEY,log TEXT);")
+        self.execute("""
+            CREATE PROCEDURE IF NOT EXISTS get_tables(IN name_starts_with VARCHAR(10))
+            BEGIN 
+                SELECT TABLE_NAME 
+                FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_NAME LIKE CONCAT(name_starts_with,'%');
+            END
+        """)
         self.close()
 
         self.__db = mysql.connector.connect(
@@ -29,6 +39,10 @@ class Database:
         )
 
         self.__cursor = self.__db.cursor()
+
+    def get_table_names(self, starts_with):
+        result = self.execute(f"CALL get_tables('{starts_with}');")
+        return result
 
     def close(self):
         self.__db.commit()
